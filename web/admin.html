@@ -1,0 +1,475 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台 · 14天备考</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12181F; --surface:#1B232C; --raised:#232D38; --paper:#EDE7D8;
+  --gold:#C9A227; --gold-dim:#8f7420; --jade:#4C9A6A; --brick:#B5544B;
+  --line:rgba(237,231,216,.14); --dim:rgba(237,231,216,.6);
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--ink); color:var(--paper);
+  font-family:'Noto Sans SC','PingFang SC',sans-serif; font-size:14.5px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px; margin:0 auto; padding:26px 20px 80px;}
+h1{font-family:'Noto Serif SC',serif; font-size:24px; margin:0;}
+h2{font-family:'Noto Serif SC',serif; font-size:17px; margin:0 0 4px;}
+.head{
+  display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+  border-bottom:1px solid var(--line); padding-bottom:16px; margin-bottom:24px;
+}
+.head .who{margin-left:auto; font-size:12.5px; color:var(--dim); font-family:var(--mono);}
+.sub{color:var(--dim); font-size:13px;}
+a{color:var(--gold);}
+
+.card{
+  background:linear-gradient(180deg,rgba(35,45,56,.55),var(--surface));
+  border:1px solid var(--line); border-radius:3px;
+  padding:20px 22px; margin-bottom:18px;
+}
+tbody tr{transition:background-color .14s ease;}
+tbody tr:hover{background:rgba(237,231,216,.028);}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+.lede{color:var(--dim); font-size:13px; margin:0 0 16px;}
+
+label{display:block; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--dim); margin-bottom:5px;}
+input,select,textarea{
+  width:100%; background:var(--ink); border:1px solid var(--line); color:var(--paper);
+  font-family:inherit; font-size:14.5px; padding:9px 11px; border-radius:2px;
+}
+input:hover,select:hover{border-color:rgba(237,231,216,.24);}
+input:focus,select:focus{
+  outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,162,39,.13);
+}
+input,select{transition:border-color .18s ease, box-shadow .18s ease;}
+
+/* Chrome 自动填充会刷成黄色——盖回深色 */
+input:-webkit-autofill,input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,input:-webkit-autofill:active{
+  -webkit-box-shadow:0 0 0 1000px #12181F inset !important;
+  -webkit-text-fill-color:var(--paper) !important;
+  caret-color:var(--paper);
+  transition:background-color 100000s ease-in-out 0s;
+}
+.row{display:grid; gap:12px; margin-bottom:14px;}
+@media(min-width:700px){ .row.c4{grid-template-columns:1.3fr .7fr 1fr 1.6fr;} .row.c2{grid-template-columns:1fr 1fr;} }
+
+button{
+  background:linear-gradient(180deg,#D8B03A,#C9A227); color:#1a1408; border:none;
+  font-family:inherit; font-size:14.5px; font-weight:700; padding:10px 20px;
+  border-radius:3px; cursor:pointer; letter-spacing:.03em;
+  box-shadow:0 1px 0 rgba(255,255,255,.26) inset, 0 5px 14px -7px rgba(201,162,39,.7);
+  transition:transform .12s ease, filter .2s ease, box-shadow .2s ease;
+}
+button:hover:not(:disabled){filter:brightness(1.07);}
+button:active:not(:disabled){transform:translateY(1px);}
+button:disabled{opacity:.5; cursor:default; box-shadow:none;}
+button:focus-visible{outline:2px solid var(--paper); outline-offset:3px;}
+/* ghost 要把实心按钮的渐变和辉光一起清掉，否则次要操作会跟主操作抢视线 */
+button.ghost{
+  background:none; color:var(--dim); border:1px solid var(--line);
+  font-weight:400; box-shadow:none; letter-spacing:0;
+}
+button.ghost:hover:not(:disabled){
+  color:var(--paper); border-color:var(--dim);
+  background:rgba(237,231,216,.04); filter:none;
+}
+button.small{font-size:12.5px; padding:5px 12px;}
+.btns{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+
+.codes{
+  background:var(--ink); border:1px solid var(--gold-dim); padding:14px;
+  font-family:var(--mono); font-size:14px; line-height:2; letter-spacing:.06em;
+  max-height:290px; overflow:auto; white-space:pre; margin:14px 0 12px; border-radius:2px;
+}
+.err{color:var(--brick); font-size:13px; min-height:20px;}
+.ok{color:var(--jade); font-size:13px;}
+
+table{width:100%; border-collapse:collapse; font-size:13px;}
+.scroll{overflow-x:auto;}
+th{text-align:left; font-size:11.5px; letter-spacing:.05em; color:var(--dim);
+   border-bottom:1px solid var(--line); padding:6px 10px 6px 0; white-space:nowrap;}
+td{padding:7px 10px 7px 0; border-bottom:1px solid rgba(237,231,216,.06); vertical-align:top;}
+td.m{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap;}
+.pill{display:inline-block; font-size:11px; padding:1px 7px; border-radius:2px; border:1px solid;}
+.pill.stock{color:var(--jade); border-color:rgba(76,154,106,.5);}
+.pill.sent{color:#8FB6D9; border-color:rgba(143,182,217,.45);}
+.pill.unused{color:var(--jade); border-color:rgba(76,154,106,.5);}
+.pill.activated{color:var(--gold); border-color:var(--gold-dim);}
+.pill.revoked{color:var(--brick); border-color:rgba(181,84,75,.5);}
+.weak{color:var(--brick);}
+
+.kpis{display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:18px;}
+@media(min-width:640px){ .kpis{grid-template-columns:repeat(4,1fr);} }
+.kpi{background:var(--surface); padding:15px 17px;}
+.kpi b{display:block; font-size:27px; font-family:var(--mono); line-height:1.2;
+       font-variant-numeric:tabular-nums; color:var(--gold);}
+.kpi span{font-size:11.5px; color:var(--dim); letter-spacing:.05em;}
+
+/* ---- 发货区 ---- */
+.ship{border-color:rgba(201,162,39,.35);}
+.ship-row{display:grid; gap:12px; align-items:end; margin-bottom:6px;}
+@media(min-width:700px){ .ship-row{grid-template-columns:1.2fr 1fr auto auto;} }
+.bigcode{
+  margin:16px 0 10px; padding:20px 18px; text-align:center;
+  background:var(--ink); border:1px solid var(--gold);
+  border-radius:3px;
+  box-shadow:0 0 30px -12px rgba(201,162,39,.6);
+  animation:pop .3s cubic-bezier(.2,.7,.3,1.2);
+}
+@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.bigcode .c{
+  font-family:var(--mono); font-size:clamp(19px,4.4vw,28px); font-weight:500;
+  letter-spacing:.14em; color:var(--gold); user-select:all; cursor:text;
+  display:block; word-break:break-all;
+}
+.bigcode .meta{font-size:12px; color:var(--dim); margin-top:9px;}
+.stockline{font-size:12.5px; color:var(--dim); margin:0;}
+.stockline b{color:var(--paper); font-family:var(--mono); font-size:14px;}
+.stockline b.low{color:var(--brick);}
+
+#login{max-width:360px; margin:12vh auto;}
+#login .card{text-align:left;}
+.hide{display:none;}
+</style>
+
+<div class="wrap">
+
+<div id="login" class="hide">
+  <div class="card">
+    <h2>后台登录</h2>
+    <p class="lede">仅限管理员账号。</p>
+    <div class="row"><div><label>邮箱</label><input id="lgEmail" type="email" autocomplete="username"></div></div>
+    <div class="row"><div><label>密码</label><input id="lgPw" type="password" autocomplete="current-password"></div></div>
+    <div class="err" id="lgErr"></div>
+    <button id="lgGo">登录</button>
+  </div>
+</div>
+
+<div id="main" class="hide">
+  <div class="head">
+    <h1>后台</h1>
+    <span class="sub"><a href="/">← 回学习页</a></span>
+    <span class="who" id="who"></span>
+    <button class="ghost small" id="logout">退出</button>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card ship">
+    <h2>发货 · 取一个码</h2>
+    <p class="lede">闲鱼买家付款后点这里：自动取出库里最早的一个未发卡密并复制到剪贴板，同时打上发货戳——
+      同一个码不会被发给两个人，即使你开着两个标签页。</p>
+    <div class="ship-row">
+      <div><label>买家订单号 / 备注（可选）</label><input id="sOrder" placeholder="例：闲鱼 王某某 / 订单尾号 8823"></div>
+      <div>
+        <label>时长</label>
+        <select id="sPlan">
+          <option value="">任意（取最早的）</option>
+          <option value="season">考季通票 · 120 天</option>
+          <option value="d14">14 天冲刺</option>
+          <option value="trial7">试用 · 7 天</option>
+          <option value="life">长期</option>
+        </select>
+      </div>
+      <div><button id="sGo">取码并复制</button></div>
+    </div>
+    <p class="stockline" id="stockLine"></p>
+    <div id="sOut"></div>
+    <div class="err" id="sErr"></div>
+  </div>
+
+  <div class="card">
+    <h2>发卡</h2>
+    <p class="lede">生成后复制或下载，导入淘宝「虚拟商品自动发货」即可 24 小时无人值守；闲鱼手动发一条。<br>
+      页面水印上的<b>授权编号</b>对应下表「编号」列——截图外流时凭它定位到具体账号。</p>
+    <div class="row c4">
+      <div>
+        <label>时长</label>
+        <select id="mPlan">
+          <option value="season">考季通票 · 120 天</option>
+          <option value="d14">14 天冲刺</option>
+          <option value="trial7">试用 · 7 天</option>
+          <option value="life">长期 · 10 年</option>
+        </select>
+      </div>
+      <div><label>数量</label><input id="mN" type="number" value="20" min="1" max="500"></div>
+      <div>
+        <label>渠道</label>
+        <select id="mChannel">
+          <option value="taobao">淘宝</option>
+          <option value="xianyu">闲鱼</option>
+          <option value="xhs">小红书</option>
+          <option value="gift">赠送/补发</option>
+        </select>
+      </div>
+      <div><label>备注（可选）</label><input id="mNote" placeholder="例：11月考期第一批"></div>
+    </div>
+    <div class="btns"><button id="mGo">生成</button><span class="err" id="mErr"></span></div>
+    <div id="mOut" class="hide">
+      <div class="codes" id="mCodes"></div>
+      <div class="btns">
+        <button class="ghost small" id="cpTxt">复制全部</button>
+        <button class="ghost small" id="dlTxt">下载 .txt（每行一个 · 淘宝用）</button>
+        <button class="ghost small" id="dlCsv">下载 .csv</button>
+        <span class="ok" id="mMsg"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>卡密</h2>
+    <div class="btns" style="margin-bottom:12px">
+      <select id="fStatus" style="width:auto">
+        <option value="stock">库存（未发出）</option>
+        <option value="sent">已发出 · 待激活</option>
+        <option value="activated">已激活</option>
+        <option value="revoked">已作废</option>
+        <option value="">全部</option>
+      </select>
+      <button class="ghost small" id="reload">刷新</button>
+      <button class="ghost small" id="expTxt">导出库存 .txt（淘宝用）</button>
+      <button class="ghost small" id="expCsv">导出库存 .csv</button>
+      <span class="sub" id="lSum"></span>
+    </div>
+    <div class="scroll"><table>
+      <thead><tr><th>激活码</th><th>时长</th><th>状态</th><th>渠道</th><th>订单/备注</th><th>编号</th><th>激活账号</th><th>到期</th><th></th></tr></thead>
+      <tbody id="lBody"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h2>全站最容易错的题</h2>
+    <p class="lede">至少被做过 5 次的题按正确率升序。下一版该往哪儿加题看这里——这也是小红书笔记的现成选题。</p>
+    <div class="scroll"><table>
+      <thead><tr><th>正确率</th><th>做过</th><th>科目 / 来源</th><th>题干</th></tr></thead>
+      <tbody id="hBody"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h2>各章正确率</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>科目</th><th>章节</th><th>做过</th><th>正确率</th></tr></thead>
+      <tbody id="cBody"></tbody>
+    </table></div>
+  </div>
+</div>
+</div>
+
+<script>
+const API='/api';
+const T={get:()=>{try{return localStorage.getItem('sp_token')}catch(e){return null}},
+         set:v=>{try{localStorage.setItem('sp_token',v)}catch(e){}},
+         clear:()=>{try{localStorage.removeItem('sp_token')}catch(e){}}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function call(path,{method='GET',body=null}={}){
+  const h={}; const t=T.get();
+  if(t) h.Authorization='Bearer '+t;
+  if(body) h['Content-Type']='application/json';
+  let r;
+  try{ r=await fetch(API+path,{method,headers:h,body:body?JSON.stringify(body):undefined}); }
+  catch(e){ const err=new Error('连不上服务器'); err.status=0; throw err; }
+  const txt=await r.text(); let d=null;
+  if(txt){ try{ d=JSON.parse(txt); }catch(e){} }
+  if(!r.ok){ const err=new Error((d&&d.error)||('请求失败 '+r.status)); err.status=r.status; throw err; }
+  return d;
+}
+
+/* ---------- 登录 ---------- */
+function showLogin(msg){
+  $('main').classList.add('hide'); $('login').classList.remove('hide');
+  $('lgErr').textContent=msg||'';
+  $('lgEmail').focus();
+}
+async function doLogin(){
+  const b=$('lgGo'); b.disabled=true; $('lgErr').textContent='';
+  try{
+    const r=await call('/login',{method:'POST',body:{
+      email:$('lgEmail').value.trim(), password:$('lgPw').value,
+      fp:'admin-console'}});
+    T.set(r.token);
+    await boot();
+  }catch(e){ $('lgErr').textContent=e.message; }
+  finally{ b.disabled=false; }
+}
+$('lgGo').addEventListener('click',doLogin);
+$('lgPw').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+$('logout').addEventListener('click',()=>{ T.clear(); location.reload(); });
+
+/* ---------- 发卡 ---------- */
+let lastCodes=[], lastPlan='';
+const PLAN_LABEL={season:'考季通票 120 天',d14:'14 天冲刺',trial7:'试用 7 天',life:'长期'};
+
+$('mGo').addEventListener('click',async()=>{
+  const b=$('mGo'); b.disabled=true; $('mErr').textContent=''; $('mMsg').textContent='';
+  try{
+    const r=await call('/admin/licenses',{method:'POST',body:{
+      n:parseInt($('mN').value,10), plan:$('mPlan').value,
+      channel:$('mChannel').value, note:$('mNote').value.trim()}});
+    lastCodes=r.codes; lastPlan=r.plan;
+    $('mCodes').textContent=r.codes.join('\n');
+    $('mOut').classList.remove('hide');
+    $('mMsg').textContent=`批次 ${r.batch_no} · ${r.days} 天 · ${r.codes.length} 个，已入库`;
+    $('fStatus').value='stock';
+    loadLicenses(); loadOverview();
+  }catch(e){ $('mErr').textContent=e.message; }
+  finally{ b.disabled=false; }
+});
+
+function download(name, text){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
+}
+const stamp=()=>new Date().toISOString().slice(0,10).replace(/-/g,'');
+$('cpTxt').addEventListener('click',async()=>{
+  try{ await navigator.clipboard.writeText(lastCodes.join('\n'));
+       $('mMsg').textContent=`已复制 ${lastCodes.length} 个`; }
+  catch(e){ $('mMsg').textContent='浏览器不允许复制，请手动选中'; }
+});
+$('dlTxt').addEventListener('click',()=>
+  download(`卡密-${lastPlan}-${stamp()}.txt`, lastCodes.join('\n')));
+$('dlCsv').addEventListener('click',()=>
+  download(`卡密-${lastPlan}-${stamp()}.csv`,
+    '﻿激活码,时长\n'+lastCodes.map(c=>`${c},${PLAN_LABEL[lastPlan]||lastPlan}`).join('\n')));
+
+/* ---------- 发货 ---------- */
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){
+    // 非 HTTPS 或权限被拒时的兜底
+    try{
+      const ta=document.createElement('textarea');
+      ta.value=t; ta.style.cssText='position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      const ok=document.execCommand('copy'); ta.remove(); return ok;
+    }catch(e2){ return false; }
+  }
+}
+
+$('sGo').addEventListener('click', async ()=>{
+  const b=$('sGo'); b.disabled=true; $('sErr').textContent='';
+  try{
+    const r=await call('/admin/licenses/dispatch',{method:'POST',body:{
+      order_no:$('sOrder').value.trim(), plan:$('sPlan').value}});
+    const copied=await copyText(r.code);
+    $('sOut').innerHTML=`
+      <div class="bigcode">
+        <span class="c">${esc(r.code)}</span>
+        <div class="meta">${esc(PLAN_LABEL[r.plan]||r.plan)} · ${r.days} 天 ·
+          ${copied?'已复制到剪贴板，直接粘贴给买家':'请手动选中复制'}</div>
+      </div>`;
+    $('sOrder').value='';
+    loadLicenses(); loadOverview();
+  }catch(e){ $('sErr').textContent=e.message; }
+  finally{ b.disabled=false; }
+});
+
+/* ---------- 列表 ---------- */
+async function loadLicenses(){
+  try{
+    const r=await call('/admin/licenses?limit=300'+($('fStatus').value?'&status='+$('fStatus').value:''));
+    const s=r.summary||{};
+    $('lSum').textContent=`库存 ${s.stock||0} · 已发出待激活 ${s.sent||0} · 已激活 ${s.activated||0} · 已作废 ${s.revoked||0}`;
+    const low=(s.stock||0)<5;
+    $('stockLine').innerHTML=`库存还剩 <b class="${low?'low':''}">${s.stock||0}</b> 个未发卡密`
+      + (low?'　——不多了，建议先到下方「发卡」补一批。':'');
+    $('lBody').innerHTML = r.licenses.length ? r.licenses.map(l=>{
+      const st = l.status==='unused' ? (l.dispatched_at?'sent':'stock') : l.status;
+      const label = {stock:'库存',sent:'已发出',activated:'已激活',revoked:'已作废'}[st]||st;
+      return `
+      <tr>
+        <td class="m">${esc(l.code)}</td>
+        <td>${esc(PLAN_LABEL[l.plan]||l.plan)}</td>
+        <td><span class="pill ${st}">${label}</span></td>
+        <td>${esc(l.channel||'')}</td>
+        <td>${esc(l.order_no||'—')}</td>
+        <td class="m">${l.uid!=null?('#'+String(l.uid).padStart(4,'0')):'—'}</td>
+        <td>${esc(l.email||'—')}</td>
+        <td class="m">${esc((l.expires_at||'').slice(0,10)||'—')}</td>
+        <td class="btns">
+          <button class="ghost small" data-copy="${esc(l.code)}">复制</button>
+          ${l.status!=='revoked'?`<button class="ghost small" data-revoke="${esc(l.code)}">作废</button>`:''}
+        </td>
+      </tr>`;}).join('') : '<tr><td colspan="9" class="sub">没有符合条件的卡密。</td></tr>';
+    $('lBody').querySelectorAll('[data-copy]').forEach(b=>
+      b.addEventListener('click', async ()=>{
+        const ok=await copyText(b.dataset.copy);
+        b.textContent = ok?'已复制':'复制失败';
+        setTimeout(()=>{b.textContent='复制';}, 1400);
+      }));
+    $('lBody').querySelectorAll('[data-revoke]').forEach(b=>
+      b.addEventListener('click',async()=>{
+        if(!confirm(`作废 ${b.dataset.revoke}？未使用的码作废后无法再激活。`)) return;
+        try{ await call(`/admin/licenses/${b.dataset.revoke}/revoke`,{method:'POST'}); loadLicenses(); }
+        catch(e){ alert(e.message); }
+      }));
+  }catch(e){ $('lSum').textContent=e.message; }
+}
+$('reload').addEventListener('click',loadLicenses);
+$('fStatus').addEventListener('change',loadLicenses);
+
+/* ---------- 导出库存 ---------- */
+async function exportStock(kind){
+  const btn = kind==='csv' ? $('expCsv') : $('expTxt');
+  const label = btn.textContent; btn.disabled=true; btn.textContent='导出中…';
+  try{
+    const r=await call('/admin/licenses?status=stock&limit=1000');
+    const codes=r.licenses.map(l=>l.code);
+    if(!codes.length){ alert('库存里没有未发出的卡密。'); return; }
+    if(kind==='csv'){
+      download(`库存卡密-${stamp()}.csv`,
+        '\ufeff激活码,时长\n'+r.licenses.map(l=>`${l.code},${PLAN_LABEL[l.plan]||l.plan}`).join('\n'));
+    }else{
+      download(`库存卡密-${stamp()}.txt`, codes.join('\n'));
+    }
+  }catch(e){ alert(e.message); }
+  finally{ btn.disabled=false; btn.textContent=label; }
+}
+$('expTxt').addEventListener('click',()=>exportStock('txt'));
+$('expCsv').addEventListener('click',()=>exportStock('csv'));
+
+/* ---------- 运营数据 ---------- */
+async function loadOverview(){
+  const o=await call('/admin/overview');
+  $('kpis').innerHTML=`
+    <div class="kpi"><b>${o.users}</b><span>注册账号</span></div>
+    <div class="kpi"><b>${o.paid_active}</b><span>授权有效</span></div>
+    <div class="kpi"><b>${o.dau_24h}</b><span>24 小时活跃</span></div>
+    <div class="kpi"><b>${(o.licenses&&o.licenses.stock)||0}</b><span>库存待发</span></div>`;
+  $('hBody').innerHTML = o.hardest.length ? o.hardest.map(h=>`
+    <tr><td class="m ${h.pct<50?'weak':''}">${h.pct}%</td><td class="m">${h.tries}</td>
+        <td>${esc(h.subject)} · ${esc(h.chapter||h.source)}</td>
+        <td>${esc(h.stem)}…</td></tr>`).join('')
+    : '<tr><td colspan="4" class="sub">还没有足够的答题数据（需某题被做过 5 次以上）。</td></tr>';
+  $('cBody').innerHTML = o.chapters.length ? o.chapters.map(c=>`
+    <tr><td>${esc(c.subject)}</td><td>${esc(c.chapter)}</td><td class="m">${c.tries}</td>
+        <td class="m ${c.pct<70?'weak':''}">${c.pct}%</td></tr>`).join('')
+    : '<tr><td colspan="4" class="sub">还没有答题数据。</td></tr>';
+}
+
+/* ---------- 启动 ---------- */
+async function boot(){
+  if(!T.get()){ showLogin(); return; }
+  try{
+    const me=await call('/me');
+    if(me.role!=='admin'){ showLogin('这个账号不是管理员。'); T.clear(); return; }
+    $('who').textContent=me.email;
+    $('login').classList.add('hide'); $('main').classList.remove('hide');
+    await Promise.all([loadOverview(), loadLicenses()]);
+  }catch(e){
+    T.clear();
+    showLogin(e.status===401?'登录已过期，请重新登录。':e.message);
+  }
+}
+boot();
+</script>
